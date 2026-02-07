@@ -9,7 +9,7 @@ st.set_page_config(page_title="Retirement Planner", page_icon="📈")
 st.markdown("""
 <style>
     header[data-testid="stHeader"] { display: none; }
-    .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 700px; }
+    .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 700px; margin: 0 auto; }
     [data-testid="stMetricLabel"] { font-size: 0.85rem; }
     [data-testid="stMetricValue"] { font-size: 1.3rem; }
     /* Compact form */
