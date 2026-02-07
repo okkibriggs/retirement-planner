@@ -95,16 +95,6 @@ else:
     else:
         color = "red"
 
-    st.markdown(
-        f"<h1 style='color:{color}; margin:0'>{'✅' if rate >= 80 else '⚠️' if rate >= 50 else '❌'} "
-        f"{rate:.1f}% Success Rate</h1>",
-        unsafe_allow_html=True,
-    )
-
-    col1, col2 = st.columns(2)
-    col1.metric("Median at Retirement", f"${stats['retirement_median']:,.0f}")
-    col2.metric("Median Final Portfolio", f"${stats['final_median']:,.0f}")
-
     # --- Portfolio trajectory chart ---
     ages = list(range(current_age, life_expectancy + 1))
     p = stats["percentiles"]
@@ -136,11 +126,19 @@ else:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Summary stats ---
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Best Case", f"${stats['final_best']:,.0f}")
-    col2.metric("Median", f"${stats['final_median']:,.0f}")
-    col3.metric("Worst Case", f"${stats['final_worst']:,.0f}")
+    # --- Success rate + metrics ---
+    st.markdown(
+        f"<h1 style='color:{color}; margin:0'>{'✅' if rate >= 80 else '⚠️' if rate >= 50 else '❌'} "
+        f"{rate:.1f}% Success Rate</h1>",
+        unsafe_allow_html=True,
+    )
+
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric("At Retirement", f"${stats['retirement_median']:,.0f}")
+    col2.metric("Median Final", f"${stats['final_median']:,.0f}")
+    col3.metric("Best Case", f"${stats['final_best']:,.0f}")
+    col4.metric("Worst Case", f"${stats['final_worst']:,.0f}")
+    col5.metric("Median", f"${stats['final_median']:,.0f}")
 
     # --- Histogram ---
     with st.expander("Distribution at Retirement"):
