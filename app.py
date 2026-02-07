@@ -8,14 +8,14 @@ st.set_page_config(page_title="Retirement Planner", page_icon="📈")
 
 st.markdown("""
 <style>
-    .block-container { padding-top: 0.5rem; padding-bottom: 1rem; max-width: 700px; }
+    .block-container { padding-top: 3rem; padding-bottom: 1rem; max-width: 700px; }
     [data-testid="stMetricLabel"] { font-size: 0.85rem; }
     [data-testid="stMetricValue"] { font-size: 1.3rem; }
     /* Compact form */
     [data-testid="stForm"] [data-testid="stVerticalBlock"] > div { padding-top: 0; padding-bottom: 0; }
     [data-testid="stForm"] .stTextInput, [data-testid="stForm"] .stNumberInput { margin-bottom: -0.5rem; }
     @media (max-width: 768px) {
-        .block-container { padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.25rem; }
+        .block-container { padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 2.5rem; }
         .success-heading { font-size: 1.3rem !important; }
         [data-testid="stMetricValue"] { font-size: 1rem; }
         [data-testid="stMetricLabel"] { font-size: 0.7rem; }
@@ -23,12 +23,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Reserve layout slots: results on top, inputs on bottom
-results_area = st.container()
-inputs_area = st.container()
+# Reserve layout slots: chart on top, options in middle, details on bottom
+chart_area = st.container()
+options_area = st.container()
+details_area = st.container()
 
-# --- Inputs (rendered second visually, but defined first for values) ---
-with inputs_area:
+# --- Options (rendered in middle visually, but defined first for values) ---
+with options_area:
     with st.form("params_form"):
         c1, c2, c3 = st.columns(3)
         current_age = c1.number_input("Age", min_value=18, max_value=80, value=30)
@@ -65,12 +66,13 @@ def parse_dollar(raw, default):
         return default
 
 
-# --- Results (rendered first visually) ---
+# --- Parse inputs ---
 current_savings = parse_dollar(savings_raw, 2_400_000)
 annual_contribution = parse_dollar(contribution_raw, 90_000)
 annual_spending = parse_dollar(spending_raw, 400_000)
 
-with results_area:
+# --- Chart (rendered first visually) ---
+with chart_area:
     if retirement_age <= current_age:
         st.error("Retirement age must be greater than current age.")
     elif life_expectancy <= retirement_age:
@@ -134,13 +136,14 @@ with results_area:
         )
         st.plotly_chart(fig, use_container_width=True)
 
-        # --- Metrics ---
+# --- Detailed Results (rendered last visually) ---
+with details_area:
+    if retirement_age > current_age and life_expectancy > retirement_age:
         col1, col2, col3 = st.columns(3)
         col1.metric("At Retirement", f"${stats['retirement_median']:,.0f}")
         col2.metric("Best Case", f"${stats['final_best']:,.0f}")
         col3.metric("Worst Case", f"${stats['final_worst']:,.0f}")
 
-        # --- Extras ---
         with st.expander("Distribution at Retirement"):
             fig2 = go.Figure()
             fig2.add_trace(go.Histogram(
