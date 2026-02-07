@@ -14,11 +14,14 @@ st.markdown("""
     /* Compact form */
     [data-testid="stForm"] [data-testid="stVerticalBlock"] > div { padding-top: 0; padding-bottom: 0; }
     [data-testid="stForm"] .stTextInput, [data-testid="stForm"] .stNumberInput { margin-bottom: -0.5rem; }
+    /* Force columns side by side on mobile */
+    [data-testid="stForm"] [data-testid="stHorizontalBlock"] { flex-wrap: nowrap; gap: 0.5rem; }
     @media (max-width: 768px) {
         .block-container { padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 2.5rem; }
         .success-heading { font-size: 1.3rem !important; }
         [data-testid="stMetricValue"] { font-size: 1rem; }
         [data-testid="stMetricLabel"] { font-size: 0.7rem; }
+        [data-testid="stForm"] [data-testid="stHorizontalBlock"] > div { flex: 1 1 50%; min-width: 0; }
     }
 </style>
 """, unsafe_allow_html=True)
