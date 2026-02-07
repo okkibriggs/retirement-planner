@@ -15,23 +15,20 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("Retirement Planner")
-st.caption("Monte Carlo simulation to estimate if your savings will last through retirement.")
 
-# --- Inputs in main area ---
+# --- Inputs ---
 with st.form("params_form"):
-    st.subheader("Your Information")
     c1, c2, c3 = st.columns(3)
     current_age = c1.number_input("Current Age", min_value=18, max_value=80, value=30)
     retirement_age = c2.number_input("Retirement Age", min_value=19, max_value=90, value=50)
     life_expectancy = c3.number_input("Life Expectancy", min_value=20, max_value=120, value=90)
 
-    st.subheader("Finances")
     savings_raw = st.text_input("Current Savings", value="$2,400,000", key="savings")
     f1, f2 = st.columns(2)
     contribution_raw = f1.text_input("Annual Contribution", value="$90,000", key="contribution")
     spending_raw = f2.text_input("Retirement Spending / yr", value="$400,000", key="spending")
 
-    with st.expander("Market Assumptions"):
+    with st.expander("Advanced Settings"):
         st.markdown("**Accumulation Phase**")
         a1, a2 = st.columns(2)
         accumulation_return = a1.slider("Return (%)", 0.0, 20.0, 9.0, 0.5, key="accum_ret")
@@ -42,7 +39,6 @@ with st.form("params_form"):
         retirement_return = r1.slider("Return (%)", 0.0, 20.0, 6.0, 0.5, key="ret_ret")
         retirement_std = r2.slider("Std Dev (%)", 0.0, 40.0, 3.0, 0.5, key="ret_std")
 
-        st.markdown("**Other**")
         o1, o2 = st.columns(2)
         inflation_rate = o1.slider("Inflation (%)", 0.0, 10.0, 3.0, 0.25)
         num_simulations = o2.select_slider("Simulations", [100, 500, 1000, 5000, 10000], 1000)
@@ -58,7 +54,7 @@ def parse_dollar(raw, default):
         return default
 
 
-# --- Always run simulation (on load and on submit) ---
+# --- Always run simulation ---
 current_savings = parse_dollar(savings_raw, 2_400_000)
 annual_contribution = parse_dollar(contribution_raw, 90_000)
 annual_spending = parse_dollar(spending_raw, 400_000)
@@ -82,11 +78,8 @@ else:
         "inflation_rate": inflation_rate / 100,
     }
 
-    with st.spinner("Running simulations..."):
-        results = run_simulation(params, num_simulations)
-        stats = calculate_statistics(results, params)
-
-    st.divider()
+    results = run_simulation(params, num_simulations)
+    stats = calculate_statistics(results, params)
 
     # --- Success rate ---
     rate = stats["success_rate"]
