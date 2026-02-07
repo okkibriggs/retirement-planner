@@ -58,6 +58,8 @@ with options_area:
         inflation_rate = o1.slider("Inflation %", 0.0, 10.0, 3.0, 0.25)
         num_simulations = o2.select_slider("Sims", [100, 500, 1000, 5000, 10000], 1000)
 
+    st.button("Run Simulation", type="primary", use_container_width=True)
+
 
 def parse_int(raw, default):
     try:
