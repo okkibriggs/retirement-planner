@@ -18,7 +18,7 @@ st.markdown("""
     /* Force columns side by side on mobile */
     [data-testid="stForm"] [data-testid="stHorizontalBlock"] { flex-wrap: nowrap; gap: 0.5rem; }
     @media (max-width: 768px) {
-        .block-container { padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.5rem; }
+        .block-container { padding-left: 1rem; padding-right: 1rem; padding-top: 0.5rem; }
         .success-heading { font-size: 1.3rem !important; }
         [data-testid="stMetricValue"] { font-size: 1rem; }
         [data-testid="stMetricLabel"] { font-size: 0.7rem; }
@@ -145,19 +145,6 @@ with chart_area:
 # --- Detailed Results (rendered last visually) ---
 with details_area:
     if retirement_age > current_age and life_expectancy > retirement_age:
-        with st.expander("Distribution at Retirement"):
-            fig2 = go.Figure()
-            fig2.add_trace(go.Histogram(
-                x=stats["retirement_values"], nbinsx=50,
-                marker_color="rgb(99, 110, 250)", opacity=0.75,
-            ))
-            fig2.update_layout(
-                xaxis_title="Portfolio ($)", xaxis_tickformat="$,.0s",
-                yaxis_title="Count", height=250,
-                margin=dict(l=0, r=0, t=10, b=40),
-            )
-            st.plotly_chart(fig2, use_container_width=True)
-
         with st.expander("Detailed Results Table"):
             runs = stats["representative_runs"]
             df = pd.DataFrame({
