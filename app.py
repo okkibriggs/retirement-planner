@@ -139,7 +139,7 @@ with chart_area:
                       annotation_text="Retire", annotation_position="top right")
         fig.update_layout(
             xaxis_title="Age", yaxis_title="Portfolio ($)", yaxis_tickformat="$,.0s",
-            hovermode=False, height=320,
+            hovermode=False, height=260,
             margin=dict(l=0, r=0, t=25, b=35),
             legend=dict(orientation="h", y=1.1, x=0.5, xanchor="center", font=dict(size=10)),
             xaxis=dict(fixedrange=True), yaxis=dict(fixedrange=True),
