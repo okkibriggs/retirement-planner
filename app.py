@@ -40,7 +40,7 @@ with options_area:
         until_raw = st.text_input("Until", value="90", key="until")
     with right:
         savings_raw = st.text_input("Savings", value="$2,400,000", key="savings")
-        contribution_raw = st.text_input("Contrib / yr", value="$90,000", key="contribution")
+        contribution_raw = st.text_input("Contribution / yr", value="$90,000", key="contribution")
         spending_raw = st.text_input("Spend / yr", value="$400,000", key="spending")
 
     with st.expander("Advanced"):
