@@ -7,6 +7,8 @@ from simulation import run_simulation, calculate_statistics
 
 st.set_page_config(page_title="Retirement Planner", page_icon="📈")
 
+st.markdown('<meta name="google-adsense-account" content="ca-pub-7451296231922651">', unsafe_allow_html=True)
+
 components.html("""
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7451296231922651"
      crossorigin="anonymous"></script>
