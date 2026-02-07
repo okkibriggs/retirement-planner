@@ -9,20 +9,39 @@ st.set_page_config(page_title="Retirement Planner", page_icon="📈")
 
 components.html("""
 <script>
-    // Inject AdSense meta tag into parent page head
-    if (!parent.document.querySelector('meta[name="google-adsense-account"]')) {
-        var meta = parent.document.createElement('meta');
-        meta.name = 'google-adsense-account';
-        meta.content = 'ca-pub-7451296231922651';
-        parent.document.head.appendChild(meta);
-    }
-    // Inject AdSense script into parent page head
-    if (!parent.document.querySelector('script[src*="adsbygoogle"]')) {
+    var head = parent.document.head;
+
+    // SEO meta tags
+    var metas = [
+        {name: 'description', content: 'Free Monte Carlo retirement calculator. Simulate thousands of market scenarios to find your chance of a successful retirement.'},
+        {name: 'keywords', content: 'retirement calculator, FIRE calculator, Monte Carlo simulation, retirement planning, can I retire, early retirement'},
+        {name: 'author', content: 'Retirement Planner'},
+        {property: 'og:title', content: 'Retirement Planner - Monte Carlo Simulator'},
+        {property: 'og:description', content: 'Run thousands of simulations to see if your retirement plan will succeed. Free, fast, and no signup required.'},
+        {property: 'og:type', content: 'website'},
+        {name: 'twitter:card', content: 'summary'},
+        {name: 'twitter:title', content: 'Retirement Planner - Monte Carlo Simulator'},
+        {name: 'twitter:description', content: 'Run thousands of simulations to see if your retirement plan will succeed.'},
+        {name: 'google-adsense-account', content: 'ca-pub-7451296231922651'}
+    ];
+    metas.forEach(function(m) {
+        var sel = m.name ? 'meta[name="'+m.name+'"]' : 'meta[property="'+m.property+'"]';
+        if (!head.querySelector(sel)) {
+            var tag = parent.document.createElement('meta');
+            if (m.name) tag.name = m.name;
+            if (m.property) tag.setAttribute('property', m.property);
+            tag.content = m.content;
+            head.appendChild(tag);
+        }
+    });
+
+    // AdSense script
+    if (!head.querySelector('script[src*="adsbygoogle"]')) {
         var script = parent.document.createElement('script');
         script.async = true;
         script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7451296231922651';
         script.crossOrigin = 'anonymous';
-        parent.document.head.appendChild(script);
+        head.appendChild(script);
     }
 </script>
 """, height=0)
