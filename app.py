@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.graph_objects as go
 
@@ -6,10 +7,10 @@ from simulation import run_simulation, calculate_statistics
 
 st.set_page_config(page_title="Retirement Planner", page_icon="📈")
 
-st.markdown("""
+components.html("""
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7451296231922651"
      crossorigin="anonymous"></script>
-""", unsafe_allow_html=True)
+""", height=0)
 
 st.markdown("""
 <style>
@@ -164,7 +165,9 @@ with details_area:
             df.set_index("Age", inplace=True)
             st.dataframe(df.style.format("${:,.0f}"), use_container_width=True, height=400)
 
-st.markdown("""
+components.html("""
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7451296231922651"
+     crossorigin="anonymous"></script>
 <ins class="adsbygoogle"
      style="display:block"
      data-ad-client="ca-pub-7451296231922651"
@@ -174,4 +177,4 @@ st.markdown("""
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
-""", unsafe_allow_html=True)
+""", height=100)
