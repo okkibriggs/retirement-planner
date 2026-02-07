@@ -6,93 +6,58 @@ from simulation import run_simulation, calculate_statistics
 
 st.set_page_config(page_title="Retirement Planner", page_icon="📈")
 
-# --- Mobile-friendly CSS ---
 st.markdown("""
 <style>
-    /* Tighter padding on mobile */
-    .block-container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-    /* Responsive metrics: stack on small screens */
-    @media (max-width: 640px) {
-        .block-container { padding-left: 0.5rem; padding-right: 0.5rem; }
-        h1 { font-size: 1.5rem !important; }
-        h3 { font-size: 1.1rem !important; }
-        [data-testid="stMetric"] { padding: 0.5rem 0; }
-    }
-    /* Compact metric labels */
+    .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 700px; }
     [data-testid="stMetricLabel"] { font-size: 0.85rem; }
+    [data-testid="stMetricValue"] { font-size: 1.3rem; }
 </style>
 """, unsafe_allow_html=True)
 
 st.title("Retirement Planner")
-st.markdown(
-    "Estimate the probability of your savings lasting through retirement "
-    "using Monte Carlo simulations."
-)
+st.caption("Monte Carlo simulation to estimate if your savings will last through retirement.")
 
-# --- Sidebar form (Enter key submits) ---
-with st.sidebar.form("params_form"):
-    st.header("Your Information")
+# --- Inputs in main area ---
+with st.form("params_form"):
+    st.subheader("Your Information")
+    c1, c2, c3 = st.columns(3)
+    current_age = c1.number_input("Current Age", min_value=18, max_value=80, value=30)
+    retirement_age = c2.number_input("Retirement Age", min_value=19, max_value=90, value=50)
+    life_expectancy = c3.number_input("Life Expectancy", min_value=20, max_value=120, value=90)
 
-    current_age = st.number_input("Current Age", min_value=18, max_value=80, value=30)
-    retirement_age = st.number_input(
-        "Retirement Age", min_value=19, max_value=90, value=50
-    )
-    life_expectancy = st.number_input(
-        "Life Expectancy", min_value=20, max_value=120, value=90
-    )
-
-    st.header("Finances")
-
+    st.subheader("Finances")
     savings_raw = st.text_input("Current Savings", value="$2,400,000", key="savings")
-    contribution_raw = st.text_input("Annual Contribution", value="$90,000", key="contribution")
-    spending_raw = st.text_input("Annual Retirement Spending", value="$400,000", key="spending")
+    f1, f2 = st.columns(2)
+    contribution_raw = f1.text_input("Annual Contribution", value="$90,000", key="contribution")
+    spending_raw = f2.text_input("Retirement Spending / yr", value="$400,000", key="spending")
 
-    st.header("Accumulation Phase Returns")
+    with st.expander("Market Assumptions"):
+        st.markdown("**Accumulation Phase**")
+        a1, a2 = st.columns(2)
+        accumulation_return = a1.slider("Return (%)", 0.0, 20.0, 9.0, 0.5, key="accum_ret")
+        accumulation_std = a2.slider("Std Dev (%)", 0.0, 40.0, 15.0, 0.5, key="accum_std")
 
-    accumulation_return = st.slider(
-        "Expected Return (%)", min_value=0.0, max_value=20.0, value=9.0, step=0.5, key="accum_ret"
-    )
-    accumulation_std = st.slider(
-        "Return Std Deviation (%)", min_value=0.0, max_value=40.0, value=15.0, step=0.5, key="accum_std"
-    )
+        st.markdown("**Retirement Phase**")
+        r1, r2 = st.columns(2)
+        retirement_return = r1.slider("Return (%)", 0.0, 20.0, 6.0, 0.5, key="ret_ret")
+        retirement_std = r2.slider("Std Dev (%)", 0.0, 40.0, 3.0, 0.5, key="ret_std")
 
-    st.header("Retirement Phase Returns")
-
-    retirement_return = st.slider(
-        "Expected Return (%)", min_value=0.0, max_value=20.0, value=6.0, step=0.5, key="ret_ret"
-    )
-    retirement_std = st.slider(
-        "Return Std Deviation (%)", min_value=0.0, max_value=40.0, value=3.0, step=0.5, key="ret_std"
-    )
-
-    st.header("Inflation")
-
-    inflation_rate = st.slider(
-        "Inflation Rate (%)", min_value=0.0, max_value=10.0, value=3.0, step=0.25
-    )
-
-    st.header("Simulation")
-
-    num_simulations = st.select_slider(
-        "Number of Simulations", options=[100, 500, 1000, 5000, 10000], value=1000
-    )
+        st.markdown("**Other**")
+        o1, o2 = st.columns(2)
+        inflation_rate = o1.slider("Inflation (%)", 0.0, 10.0, 3.0, 0.25)
+        num_simulations = o2.select_slider("Simulations", [100, 500, 1000, 5000, 10000], 1000)
 
     submitted = st.form_submit_button("Run Simulation", type="primary", use_container_width=True)
 
 
 def parse_dollar(raw, default):
-    """Parse a dollar string like '$2,400,000' into an int."""
     try:
         return int(raw.replace("$", "").replace(",", "").strip())
     except ValueError:
-        st.sidebar.error(f"Invalid dollar value: {raw}")
+        st.error(f"Invalid dollar value: {raw}")
         return default
 
 
-# --- Run simulation ---
 if submitted:
     current_savings = parse_dollar(savings_raw, 2_400_000)
     annual_contribution = parse_dollar(contribution_raw, 90_000)
@@ -121,6 +86,8 @@ if submitted:
             results = run_simulation(params, num_simulations)
             stats = calculate_statistics(results, params)
 
+        st.divider()
+
         # --- Success rate ---
         rate = stats["success_rate"]
         if rate >= 80:
@@ -130,116 +97,80 @@ if submitted:
         else:
             color = "red"
 
-        st.metric("Success Rate", f"{rate:.1f}%")
-        col1, col2 = st.columns(2)
-        col1.metric("Median Final Portfolio", f"${stats['final_median']:,.0f}")
-        col2.metric("Median at Retirement", f"${stats['retirement_median']:,.0f}")
-
         st.markdown(
-            f"<h3 style='color:{color}'>{'✅' if rate >= 80 else '⚠️' if rate >= 50 else '❌'} "
-            f"{rate:.1f}% of simulations succeeded</h3>",
+            f"<h2 style='color:{color}; margin-bottom:0'>{'✅' if rate >= 80 else '⚠️' if rate >= 50 else '❌'} "
+            f"{rate:.1f}% Success Rate</h2>",
             unsafe_allow_html=True,
         )
 
-        # --- Portfolio trajectory chart ---
-        st.subheader("Portfolio Value Over Time")
+        col1, col2 = st.columns(2)
+        col1.metric("Median at Retirement", f"${stats['retirement_median']:,.0f}")
+        col2.metric("Median Final Portfolio", f"${stats['final_median']:,.0f}")
 
+        # --- Portfolio trajectory chart ---
         ages = list(range(current_age, life_expectancy + 1))
         p = stats["percentiles"]
 
         fig = go.Figure()
-
-        # Shaded confidence band (10th–90th)
         fig.add_trace(go.Scatter(
             x=ages + ages[::-1],
             y=list(p["p90"]) + list(p["p10"][::-1]),
-            fill="toself",
-            fillcolor="rgba(99, 110, 250, 0.15)",
-            line=dict(color="rgba(255,255,255,0)"),
-            name="10th–90th percentile",
+            fill="toself", fillcolor="rgba(99, 110, 250, 0.15)",
+            line=dict(color="rgba(255,255,255,0)"), name="10th–90th",
         ))
-
-        # 25th–75th band
         fig.add_trace(go.Scatter(
             x=ages + ages[::-1],
             y=list(p["p75"]) + list(p["p25"][::-1]),
-            fill="toself",
-            fillcolor="rgba(99, 110, 250, 0.3)",
-            line=dict(color="rgba(255,255,255,0)"),
-            name="25th–75th percentile",
+            fill="toself", fillcolor="rgba(99, 110, 250, 0.3)",
+            line=dict(color="rgba(255,255,255,0)"), name="25th–75th",
         ))
-
-        # Median line
         fig.add_trace(go.Scatter(
-            x=ages, y=list(p["p50"]),
-            mode="lines",
-            line=dict(color="rgb(99, 110, 250)", width=3),
-            name="Median",
+            x=ages, y=list(p["p50"]), mode="lines",
+            line=dict(color="rgb(99, 110, 250)", width=3), name="Median",
         ))
-
-        # Retirement age marker
         fig.add_vline(x=retirement_age, line_dash="dash", line_color="gray",
-                      annotation_text="Retirement", annotation_position="top right")
-
+                      annotation_text="Retire", annotation_position="top right")
         fig.update_layout(
-            xaxis_title="Age",
-            yaxis_title="Portfolio Value ($)",
-            yaxis_tickformat="$,.0f",
-            hovermode="x unified",
-            height=400,
-            margin=dict(l=10, r=10, t=30, b=40),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5,
-                        font=dict(size=11)),
+            xaxis_title="Age", yaxis_title="Portfolio ($)", yaxis_tickformat="$,.0s",
+            hovermode="x unified", height=350,
+            margin=dict(l=0, r=0, t=30, b=40),
+            legend=dict(orientation="h", y=1.12, x=0.5, xanchor="center", font=dict(size=10)),
         )
-
         st.plotly_chart(fig, use_container_width=True)
 
-        # --- Histogram of portfolio values at retirement ---
-        st.subheader("Distribution of Portfolio Value at Retirement")
-
-        fig2 = go.Figure()
-        fig2.add_trace(go.Histogram(
-            x=stats["retirement_values"],
-            nbinsx=50,
-            marker_color="rgb(99, 110, 250)",
-            opacity=0.75,
-        ))
-        fig2.update_layout(
-            xaxis_title="Portfolio Value ($)",
-            xaxis_tickformat="$,.0f",
-            yaxis_title="Count",
-            height=300,
-            margin=dict(l=10, r=10, t=10, b=40),
-        )
-
-        st.plotly_chart(fig2, use_container_width=True)
-
-        # --- Summary table ---
-        st.subheader("Summary Statistics")
-
+        # --- Summary stats ---
         col1, col2, col3 = st.columns(3)
         col1.metric("Best Case", f"${stats['final_best']:,.0f}")
         col2.metric("Median", f"${stats['final_median']:,.0f}")
         col3.metric("Worst Case", f"${stats['final_worst']:,.0f}")
 
-        # --- Percentile table by age (actual simulation runs) ---
-        with st.expander("View Detailed Results Table"):
-            ages = list(range(current_age, life_expectancy + 1))
+        # --- Histogram ---
+        with st.expander("Distribution at Retirement"):
+            fig2 = go.Figure()
+            fig2.add_trace(go.Histogram(
+                x=stats["retirement_values"], nbinsx=50,
+                marker_color="rgb(99, 110, 250)", opacity=0.75,
+            ))
+            fig2.update_layout(
+                xaxis_title="Portfolio ($)", xaxis_tickformat="$,.0s",
+                yaxis_title="Count", height=250,
+                margin=dict(l=0, r=0, t=10, b=40),
+            )
+            st.plotly_chart(fig2, use_container_width=True)
+
+        # --- Detailed table ---
+        with st.expander("Detailed Results Table"):
             runs = stats["representative_runs"]
             df = pd.DataFrame({
                 "Age": ages,
-                "10th Percentile Run": runs["p10"],
-                "25th Percentile Run": runs["p25"],
-                "Median Run": runs["p50"],
-                "75th Percentile Run": runs["p75"],
-                "90th Percentile Run": runs["p90"],
+                "10th Pctl": runs["p10"],
+                "25th Pctl": runs["p25"],
+                "Median": runs["p50"],
+                "75th Pctl": runs["p75"],
+                "90th Pctl": runs["p90"],
             })
             df.set_index("Age", inplace=True)
-            st.dataframe(
-                df.style.format("${:,.0f}"),
-                use_container_width=True,
-                height=400,
-            )
+            st.dataframe(df.style.format("${:,.0f}"), use_container_width=True, height=400)
 
 else:
-    st.info("Adjust your parameters in the sidebar and press **Enter** to see results.")
+    st.info("Press **Enter** or click **Run Simulation** to see results.")
