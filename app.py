@@ -12,19 +12,16 @@ st.markdown("""
     .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 700px; margin: 0 auto; }
     [data-testid="stMetricLabel"] { font-size: 0.85rem; }
     [data-testid="stMetricValue"] { font-size: 1.3rem; }
-    /* Compact form */
-    [data-testid="stForm"] [data-testid="stVerticalBlock"] > div { padding-top: 0; padding-bottom: 0; }
-    [data-testid="stForm"] .stTextInput, [data-testid="stForm"] .stNumberInput { margin-bottom: -0.5rem; }
-    [data-testid="stForm"] .stTextInput [data-testid="InputInstructions"] span { visibility: hidden; }
-    [data-testid="stForm"] .stTextInput [data-testid="InputInstructions"] span::after { content: "Press Enter to see results"; visibility: visible; }
+    /* Compact inputs */
+    .stTextInput, .stNumberInput { margin-bottom: -0.5rem; }
     /* Force columns side by side on mobile */
-    [data-testid="stForm"] [data-testid="stHorizontalBlock"] { flex-wrap: nowrap; gap: 0.5rem; }
+    [data-testid="stHorizontalBlock"] { flex-wrap: nowrap; gap: 0.5rem; }
     @media (max-width: 768px) {
         .block-container { padding-left: 1rem; padding-right: 1rem; padding-top: 0.5rem; }
         .success-heading { font-size: 1.3rem !important; }
         [data-testid="stMetricValue"] { font-size: 1rem; }
         [data-testid="stMetricLabel"] { font-size: 0.7rem; }
-        [data-testid="stForm"] [data-testid="stHorizontalBlock"] > div { flex: 1 1 50%; min-width: 0; }
+        [data-testid="stHorizontalBlock"] > div { flex: 1 1 50%; min-width: 0; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -36,33 +33,30 @@ details_area = st.container()
 
 # --- Options (rendered in middle visually, but defined first for values) ---
 with options_area:
-    with st.form("params_form"):
-        left, right = st.columns(2)
-        with left:
-            age_raw = st.text_input("Age", value="30", key="age")
-            retire_raw = st.text_input("Retire", value="50", key="retire")
-            until_raw = st.text_input("Until", value="90", key="until")
-        with right:
-            savings_raw = st.text_input("Savings", value="$2,400,000", key="savings")
-            contribution_raw = st.text_input("Contrib / yr", value="$90,000", key="contribution")
-            spending_raw = st.text_input("Spend / yr", value="$400,000", key="spending")
+    left, right = st.columns(2)
+    with left:
+        age_raw = st.text_input("Age", value="30", key="age")
+        retire_raw = st.text_input("Retire", value="50", key="retire")
+        until_raw = st.text_input("Until", value="90", key="until")
+    with right:
+        savings_raw = st.text_input("Savings", value="$2,400,000", key="savings")
+        contribution_raw = st.text_input("Contrib / yr", value="$90,000", key="contribution")
+        spending_raw = st.text_input("Spend / yr", value="$400,000", key="spending")
 
-        with st.expander("Advanced"):
-            st.caption("Accumulation Phase")
-            a1, a2 = st.columns(2)
-            accumulation_return = a1.slider("Return %", 0.0, 20.0, 9.0, 0.5, key="accum_ret")
-            accumulation_std = a2.slider("Std Dev %", 0.0, 40.0, 15.0, 0.5, key="accum_std")
+    with st.expander("Advanced"):
+        st.caption("Accumulation Phase")
+        a1, a2 = st.columns(2)
+        accumulation_return = a1.slider("Return %", 0.0, 20.0, 9.0, 0.5, key="accum_ret")
+        accumulation_std = a2.slider("Std Dev %", 0.0, 40.0, 15.0, 0.5, key="accum_std")
 
-            st.caption("Retirement Phase")
-            r1, r2 = st.columns(2)
-            retirement_return = r1.slider("Return %", 0.0, 20.0, 6.0, 0.5, key="ret_ret")
-            retirement_std = r2.slider("Std Dev %", 0.0, 40.0, 3.0, 0.5, key="ret_std")
+        st.caption("Retirement Phase")
+        r1, r2 = st.columns(2)
+        retirement_return = r1.slider("Return %", 0.0, 20.0, 6.0, 0.5, key="ret_ret")
+        retirement_std = r2.slider("Std Dev %", 0.0, 40.0, 3.0, 0.5, key="ret_std")
 
-            o1, o2 = st.columns(2)
-            inflation_rate = o1.slider("Inflation %", 0.0, 10.0, 3.0, 0.25)
-            num_simulations = o2.select_slider("Sims", [100, 500, 1000, 5000, 10000], 1000)
-
-        st.form_submit_button("Run Simulation", type="primary", use_container_width=True)
+        o1, o2 = st.columns(2)
+        inflation_rate = o1.slider("Inflation %", 0.0, 10.0, 3.0, 0.25)
+        num_simulations = o2.select_slider("Sims", [100, 500, 1000, 5000, 10000], 1000)
 
 
 def parse_int(raw, default):
