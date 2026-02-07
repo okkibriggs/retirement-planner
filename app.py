@@ -8,7 +8,8 @@ st.set_page_config(page_title="Retirement Planner", page_icon="📈")
 
 st.markdown("""
 <style>
-    .block-container { padding-top: 3rem; padding-bottom: 1rem; max-width: 700px; }
+    header[data-testid="stHeader"] { display: none; }
+    .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 700px; }
     [data-testid="stMetricLabel"] { font-size: 0.85rem; }
     [data-testid="stMetricValue"] { font-size: 1.3rem; }
     /* Compact form */
@@ -17,7 +18,7 @@ st.markdown("""
     /* Force columns side by side on mobile */
     [data-testid="stForm"] [data-testid="stHorizontalBlock"] { flex-wrap: nowrap; gap: 0.5rem; }
     @media (max-width: 768px) {
-        .block-container { padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 2.5rem; }
+        .block-container { padding-left: 0.5rem; padding-right: 0.5rem; padding-top: 0.5rem; }
         .success-heading { font-size: 1.3rem !important; }
         [data-testid="stMetricValue"] { font-size: 1rem; }
         [data-testid="stMetricLabel"] { font-size: 0.7rem; }
@@ -133,20 +134,17 @@ with chart_area:
                       annotation_text="Retire", annotation_position="top right")
         fig.update_layout(
             xaxis_title="Age", yaxis_title="Portfolio ($)", yaxis_tickformat="$,.0s",
-            hovermode="x unified", height=320,
+            hovermode=False, height=320,
             margin=dict(l=0, r=0, t=25, b=35),
             legend=dict(orientation="h", y=1.1, x=0.5, xanchor="center", font=dict(size=10)),
+            xaxis=dict(fixedrange=True), yaxis=dict(fixedrange=True),
+            dragmode=False,
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False, "staticPlot": True})
 
 # --- Detailed Results (rendered last visually) ---
 with details_area:
     if retirement_age > current_age and life_expectancy > retirement_age:
-        col1, col2, col3 = st.columns(3)
-        col1.metric("At Retirement", f"${stats['retirement_median']:,.0f}")
-        col2.metric("Best Case", f"${stats['final_best']:,.0f}")
-        col3.metric("Worst Case", f"${stats['final_worst']:,.0f}")
-
         with st.expander("Distribution at Retirement"):
             fig2 = go.Figure()
             fig2.add_trace(go.Histogram(
