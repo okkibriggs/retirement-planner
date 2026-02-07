@@ -15,6 +15,8 @@ st.markdown("""
     /* Compact form */
     [data-testid="stForm"] [data-testid="stVerticalBlock"] > div { padding-top: 0; padding-bottom: 0; }
     [data-testid="stForm"] .stTextInput, [data-testid="stForm"] .stNumberInput { margin-bottom: -0.5rem; }
+    [data-testid="stForm"] .stTextInput [data-testid="InputInstructions"] span { visibility: hidden; }
+    [data-testid="stForm"] .stTextInput [data-testid="InputInstructions"] span::after { content: "Press Enter to see results"; visibility: visible; }
     /* Force columns side by side on mobile */
     [data-testid="stForm"] [data-testid="stHorizontalBlock"] { flex-wrap: nowrap; gap: 0.5rem; }
     @media (max-width: 768px) {
@@ -37,9 +39,9 @@ with options_area:
     with st.form("params_form"):
         left, right = st.columns(2)
         with left:
-            current_age = st.number_input("Age", min_value=18, max_value=80, value=30)
-            retirement_age = st.number_input("Retire", min_value=19, max_value=90, value=50)
-            life_expectancy = st.number_input("Until", min_value=20, max_value=120, value=90)
+            age_raw = st.text_input("Age", value="30", key="age")
+            retire_raw = st.text_input("Retire", value="50", key="retire")
+            until_raw = st.text_input("Until", value="90", key="until")
         with right:
             savings_raw = st.text_input("Savings", value="$2,400,000", key="savings")
             contribution_raw = st.text_input("Contrib / yr", value="$90,000", key="contribution")
@@ -63,7 +65,7 @@ with options_area:
         st.form_submit_button("Run Simulation", type="primary", use_container_width=True)
 
 
-def parse_dollar(raw, default):
+def parse_int(raw, default):
     try:
         return int(raw.replace("$", "").replace(",", "").strip())
     except ValueError:
@@ -71,9 +73,12 @@ def parse_dollar(raw, default):
 
 
 # --- Parse inputs ---
-current_savings = parse_dollar(savings_raw, 2_400_000)
-annual_contribution = parse_dollar(contribution_raw, 90_000)
-annual_spending = parse_dollar(spending_raw, 400_000)
+current_age = parse_int(age_raw, 30)
+retirement_age = parse_int(retire_raw, 50)
+life_expectancy = parse_int(until_raw, 90)
+current_savings = parse_int(savings_raw, 2_400_000)
+annual_contribution = parse_int(contribution_raw, 90_000)
+annual_spending = parse_int(spending_raw, 400_000)
 
 # --- Chart (rendered first visually) ---
 with chart_area:
