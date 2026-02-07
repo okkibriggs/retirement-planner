@@ -31,15 +31,15 @@ details_area = st.container()
 # --- Options (rendered in middle visually, but defined first for values) ---
 with options_area:
     with st.form("params_form"):
-        c1, c2, c3 = st.columns(3)
-        current_age = c1.number_input("Age", min_value=18, max_value=80, value=30)
-        retirement_age = c2.number_input("Retire", min_value=19, max_value=90, value=50)
-        life_expectancy = c3.number_input("Until", min_value=20, max_value=120, value=90)
-
-        f1, f2, f3 = st.columns(3)
-        savings_raw = f1.text_input("Savings", value="$2,400,000", key="savings")
-        contribution_raw = f2.text_input("Contrib / yr", value="$90,000", key="contribution")
-        spending_raw = f3.text_input("Spend / yr", value="$400,000", key="spending")
+        left, right = st.columns(2)
+        with left:
+            current_age = st.number_input("Age", min_value=18, max_value=80, value=30)
+            retirement_age = st.number_input("Retire", min_value=19, max_value=90, value=50)
+            life_expectancy = st.number_input("Until", min_value=20, max_value=120, value=90)
+        with right:
+            savings_raw = st.text_input("Savings", value="$2,400,000", key="savings")
+            contribution_raw = st.text_input("Contrib / yr", value="$90,000", key="contribution")
+            spending_raw = st.text_input("Spend / yr", value="$400,000", key="spending")
 
         with st.expander("Advanced"):
             st.caption("Accumulation Phase")
