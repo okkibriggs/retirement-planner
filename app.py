@@ -4,12 +4,32 @@ import plotly.graph_objects as go
 
 from simulation import run_simulation, calculate_statistics
 
-st.set_page_config(page_title="Retirement Planner", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Retirement Planner", page_icon="📈")
 
-st.title("Retirement Planning — Monte Carlo Simulator")
+# --- Mobile-friendly CSS ---
+st.markdown("""
+<style>
+    /* Tighter padding on mobile */
+    .block-container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    /* Responsive metrics: stack on small screens */
+    @media (max-width: 640px) {
+        .block-container { padding-left: 0.5rem; padding-right: 0.5rem; }
+        h1 { font-size: 1.5rem !important; }
+        h3 { font-size: 1.1rem !important; }
+        [data-testid="stMetric"] { padding: 0.5rem 0; }
+    }
+    /* Compact metric labels */
+    [data-testid="stMetricLabel"] { font-size: 0.85rem; }
+</style>
+""", unsafe_allow_html=True)
+
+st.title("Retirement Planner")
 st.markdown(
     "Estimate the probability of your savings lasting through retirement "
-    "using Monte Carlo simulations with randomized market returns."
+    "using Monte Carlo simulations."
 )
 
 # --- Sidebar form (Enter key submits) ---
@@ -110,10 +130,10 @@ if submitted:
         else:
             color = "red"
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Success Rate", f"{rate:.1f}%")
-        col2.metric("Median Final Portfolio", f"${stats['final_median']:,.0f}")
-        col3.metric("Median at Retirement", f"${stats['retirement_median']:,.0f}")
+        st.metric("Success Rate", f"{rate:.1f}%")
+        col1, col2 = st.columns(2)
+        col1.metric("Median Final Portfolio", f"${stats['final_median']:,.0f}")
+        col2.metric("Median at Retirement", f"${stats['retirement_median']:,.0f}")
 
         st.markdown(
             f"<h3 style='color:{color}'>{'✅' if rate >= 80 else '⚠️' if rate >= 50 else '❌'} "
@@ -166,7 +186,10 @@ if submitted:
             yaxis_title="Portfolio Value ($)",
             yaxis_tickformat="$,.0f",
             hovermode="x unified",
-            height=500,
+            height=400,
+            margin=dict(l=10, r=10, t=30, b=40),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5,
+                        font=dict(size=11)),
         )
 
         st.plotly_chart(fig, use_container_width=True)
@@ -184,8 +207,9 @@ if submitted:
         fig2.update_layout(
             xaxis_title="Portfolio Value ($)",
             xaxis_tickformat="$,.0f",
-            yaxis_title="Number of Simulations",
-            height=400,
+            yaxis_title="Count",
+            height=300,
+            margin=dict(l=10, r=10, t=10, b=40),
         )
 
         st.plotly_chart(fig2, use_container_width=True)
@@ -194,9 +218,9 @@ if submitted:
         st.subheader("Summary Statistics")
 
         col1, col2, col3 = st.columns(3)
-        col1.metric("Best Case (Final)", f"${stats['final_best']:,.0f}")
-        col2.metric("Median (Final)", f"${stats['final_median']:,.0f}")
-        col3.metric("Worst Case (Final)", f"${stats['final_worst']:,.0f}")
+        col1.metric("Best Case", f"${stats['final_best']:,.0f}")
+        col2.metric("Median", f"${stats['final_median']:,.0f}")
+        col3.metric("Worst Case", f"${stats['final_worst']:,.0f}")
 
         # --- Percentile table by age (actual simulation runs) ---
         with st.expander("View Detailed Results Table"):
