@@ -11,9 +11,10 @@ st.markdown("""
     .block-container { padding-top: 1rem; padding-bottom: 1rem; }
     [data-testid="stMetricLabel"] { font-size: 0.85rem; }
     [data-testid="stMetricValue"] { font-size: 1.3rem; }
-    /* Tighter vertical spacing in form inputs */
+    /* Compact form */
     [data-testid="stForm"] [data-testid="stVerticalBlock"] > div { padding-top: 0; padding-bottom: 0; }
-    [data-testid="stForm"] .stTextInput, [data-testid="stForm"] .stNumberInput { margin-bottom: -0.5rem; }
+    [data-testid="stForm"] .stTextInput, [data-testid="stForm"] .stNumberInput { margin-bottom: -0.75rem; }
+    [data-testid="stForm"] [data-testid="stExpander"] { margin-top: -0.5rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -29,10 +30,10 @@ with left_col:
         retirement_age = c2.number_input("Retire", min_value=19, max_value=90, value=50)
         life_expectancy = c3.number_input("Until", min_value=20, max_value=120, value=90)
 
-        savings_raw = st.text_input("Current Savings", value="$2,400,000", key="savings")
-        f1, f2 = st.columns(2)
-        contribution_raw = f1.text_input("Contribution / yr", value="$90,000", key="contribution")
-        spending_raw = f2.text_input("Spending / yr", value="$400,000", key="spending")
+        f1, f2, f3 = st.columns(3)
+        savings_raw = f1.text_input("Savings", value="$2,400,000", key="savings")
+        contribution_raw = f2.text_input("Contrib / yr", value="$90,000", key="contribution")
+        spending_raw = f3.text_input("Spend / yr", value="$400,000", key="spending")
 
         with st.expander("Advanced"):
             st.caption("Accumulation Phase")
