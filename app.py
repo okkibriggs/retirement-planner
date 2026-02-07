@@ -11,11 +11,18 @@ st.markdown("""
     .block-container { padding-top: 1rem; padding-bottom: 1rem; }
     [data-testid="stMetricLabel"] { font-size: 0.85rem; }
     [data-testid="stMetricValue"] { font-size: 1.3rem; }
-    /* Keep sidebar open by default */
+    /* Keep sidebar open by default on desktop */
     [data-testid="stSidebar"] { min-width: 320px; max-width: 380px; }
     /* Compact sidebar inputs */
     [data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div { padding-top: 0; padding-bottom: 0; }
     [data-testid="stSidebar"] .stTextInput, [data-testid="stSidebar"] .stNumberInput { margin-bottom: -0.5rem; }
+    /* Mobile */
+    @media (max-width: 768px) {
+        .block-container { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .success-heading { font-size: 1.4rem !important; }
+        [data-testid="stMetricValue"] { font-size: 1rem; }
+        [data-testid="stMetricLabel"] { font-size: 0.75rem; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -128,17 +135,15 @@ else:
 
     # --- Success rate + metrics ---
     st.markdown(
-        f"<h1 style='color:{color}; margin:0'>{'✅' if rate >= 80 else '⚠️' if rate >= 50 else '❌'} "
-        f"{rate:.1f}% Success Rate</h1>",
+        f"<p class='success-heading' style='color:{color}; margin:0; font-size:2rem; font-weight:700'>"
+        f"{'✅' if rate >= 80 else '⚠️' if rate >= 50 else '❌'} {rate:.1f}% Success Rate</p>",
         unsafe_allow_html=True,
     )
 
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3 = st.columns(3)
     col1.metric("At Retirement", f"${stats['retirement_median']:,.0f}")
-    col2.metric("Median Final", f"${stats['final_median']:,.0f}")
-    col3.metric("Best Case", f"${stats['final_best']:,.0f}")
-    col4.metric("Worst Case", f"${stats['final_worst']:,.0f}")
-    col5.metric("Median", f"${stats['final_median']:,.0f}")
+    col2.metric("Best Case", f"${stats['final_best']:,.0f}")
+    col3.metric("Worst Case", f"${stats['final_worst']:,.0f}")
 
     # --- Histogram ---
     with st.expander("Distribution at Retirement"):
